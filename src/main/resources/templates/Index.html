@@ -5,6 +5,9 @@
         <title>Cajero</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+
+        </style>
     </head>
     <body layout:fragment="body">
         <div class="container mt-5">
@@ -25,17 +28,23 @@
                             <label for="monto" class="form-label">Ingresa la cantidad a retirar</label>
                             <input type="text" class="form-control" id="monto" th:field="*{monto}">
                         </div>
-                        <input value="0" type="button" onclick="form1.monto.value += '0' "/>
-                        <input value="1" type="button" onclick="form1.monto.value += '1' "/>
-                        <input value="2" type="button" onclick="form1.monto.value += '2' "/>
-                        <input value="3" type="button" onclick="form1.monto.value += '3' "/>
-                        <input value="4" type="button" onclick="form1.monto.value += '4' "/>
-                        <input value="5" type="button" onclick="form1.monto.value += '5' "/>
-                        <input value="6" type="button" onclick="form1.monto.value += '6' "/>
-                        <input value="7" type="button" onclick="form1.monto.value += '7' "/>
-                        <input value="8" type="button" onclick="form1.monto.value += '8' "/>
-                        <input value="9" type="button" onclick="form1.monto.value += '9' "/>
-                        <input type="button" value="Clear All" onclick="form1.monto.value = '' " id="clear" >
+                        <div class="row justify-content-center">
+                            <div class="col-5">
+                                <input value="0" type="button" onclick="form1.monto.value += '0'"/>
+                                <input value="1" type="button" onclick="form1.monto.value += '1'"/>
+                                <input value="2" type="button" onclick="form1.monto.value += '2'"/>
+                                <input value="3" type="button" onclick="form1.monto.value += '3'"/>
+                            </div>
+                        </div>
+                        <div>
+                            <input value="4" type="button" onclick="form1.monto.value += '4'"/>
+                            <input value="5" type="button" onclick="form1.monto.value += '5'"/>
+                            <input value="6" type="button" onclick="form1.monto.value += '6'"/>
+                            <input value="7" type="button" onclick="form1.monto.value += '7'"/>
+                        </div>
+                        <input value="8" type="button" onclick="form1.monto.value += '8'"/>
+                        <input value="9" type="button" onclick="form1.monto.value += '9'"/>
+                        <input type="button" value="Clear All" onclick="form1.monto.value = ''" id="clear" >
                         <div class="row justify-content-center mt-5">
                             <div class="col-1">
                                 <button type="submit" class="btn btn-primary">Retirar</button>
