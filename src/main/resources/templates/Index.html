@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{Layout}">
+    <head>
+        <title>Cajero</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body layout:fragment="body">
+        <div class="container mt-5">
+
+            <div class="row justify-content-center">
+                <div class="col-6">
+                    <a type="button" class="btn btn-outline-primary" th:href="@{/home/llenarCajero}">Llenar cajero</a>
+                </div>
+                <div class="col-4">
+                    <h6>Cantidad disponible en el cajero</h6>
+                    <p th:text="${cantidad}"></p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 mt-5">
+                    <form name="form1" class="row justify-content-center g-3" method="post" th:action="@{/home/retirar}" th:object="${monto}">
+                        <div class="col-md-6">
+                            <label for="monto" class="form-label">Ingresa la cantidad a retirar</label>
+                            <input type="text" class="form-control" id="monto" th:field="*{monto}">
+                        </div>
+                        <input value="0" type="button" onclick="form1.monto.value += '0' "/>
+                        <input value="1" type="button" onclick="form1.monto.value += '1' "/>
+                        <input value="2" type="button" onclick="form1.monto.value += '2' "/>
+                        <input value="3" type="button" onclick="form1.monto.value += '3' "/>
+                        <input value="4" type="button" onclick="form1.monto.value += '4' "/>
+                        <input value="5" type="button" onclick="form1.monto.value += '5' "/>
+                        <input value="6" type="button" onclick="form1.monto.value += '6' "/>
+                        <input value="7" type="button" onclick="form1.monto.value += '7' "/>
+                        <input value="8" type="button" onclick="form1.monto.value += '8' "/>
+                        <input value="9" type="button" onclick="form1.monto.value += '9' "/>
+                        <input type="button" value="Clear All" onclick="form1.monto.value = '' " id="clear" >
+                        <div class="row justify-content-center mt-5">
+                            <div class="col-1">
+                                <button type="submit" class="btn btn-primary">Retirar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row justify-content-center" th:if="${efectivoEntregado != null}">
+                <div class="col-6 mt-5">
+                    <h3>Billetes/monedas entregados:</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Denominación</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="efectivo : ${efectivoEntregado}">
+                                <td th:text="${efectivo.key}">Denominación</td>
+                                <td th:text="${efectivo.value}">Cantidad</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                const display = document.querySelector('.display');
+                const buttons = document.querySelectorAll('button');
+
+                buttons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const value = button.dataset.value;
+
+                        if (value === '=') {
+                            try {
+                                display.value = eval(display.value);
+                            } catch {
+                                display.value = 'Error';
+                            }
+                        } else if (value === 'C') {
+                            display.value = '';
+                        } else {
+                            display.value += value;
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </body>
+</html>

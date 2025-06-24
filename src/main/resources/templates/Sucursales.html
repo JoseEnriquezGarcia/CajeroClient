@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    layout:decorate="~{Layout}">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body layout:fragment="body">
+        <div class="container mt-5">
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">IdEmpresa</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Ubicacion</th>
+                        <th scope="col">Telefono</th>
+                        <th scope="col">Horario</th>
+                        <th scope="col">Clasificacion</th>
+                        <th scope="col">Nombre Gerente</th>
+                    </tr>
+                </thead>
+                <tbody th:each="sucursal: ${sucursales}">
+                    <tr>
+                        <th th:text="${sucursal.IdSucursal}"></th>
+                        <td th:text="${sucursal.Nombre}"></td>
+                        <td th:text="${sucursal.Email}"></td>
+                        <td th:text="${sucursal.Ubicacion}"></td>
+                        <td th:text="${sucursal.Telefono}"></td>
+                        <td th:text="${sucursal.Horario}"></td>
+                        <td th:text="${sucursal.Clasificacion}"></td>
+                        <td th:text="${sucursal.NombreGerente}"></td>
+                        <td><a class="btn btn-primary" role="button">Link</a></td>
+                        <td><a class="btn btn-primary" href="#" role="button">Link</a></td>
+                        <td><a class="btn btn-primary" href="#" role="button">Link</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
