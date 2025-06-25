@@ -29,7 +29,7 @@ public class CajeroController {
     private RestTemplate restTemplate = new RestTemplate();
     private String urlBase = "http://localhost:8081/cajero";
 
-    @GetMapping("/info")
+    @GetMapping
     public String GetAllMonedas(Model model) {
         try {
             Monto monto = new Monto();
@@ -87,7 +87,7 @@ public class CajeroController {
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
-        return "redirect:/home/info";
+        return "redirect:/home";
     }
 
     @PostMapping("/retirar")

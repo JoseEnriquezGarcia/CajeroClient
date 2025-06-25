@@ -6,48 +6,157 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            #cal-body {
+                width: 800px;
+                border-radius: 20px;
+                background: #363c3d;
+                box-shadow: -5px -5px 9px rgba(255,255,255,0.45), 5px 5px 9px rgba(94,104,121,0.3);
+                padding: 25px;
+                scale: 0.8;
+            }
+
+            .input input {
+                width: 100%;
+                height: 70px;
+                border-radius: 10px;
+                background: #0a0a0a;
+                border: none;
+                color: rgb(60, 60, 60);
+                font-size: 2rem;
+                padding: 0 20px;
+                margin-bottom: 20px;
+                box-sizing: border-box;
+
+            }
+
+            .input input:focus {
+                outline: none;
+            }
+
+            .buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: space-between;
+                margin-bottom: 15px;
+            }
+
+            .buttons input[type="button"] {
+                flex: 1 1 22%;
+                height: 60px;
+                font-size: 1.5rem;
+                border: none;
+                border-radius: 10px;
+                background: #dde1e7;
+                color: rgb(60, 60, 60);
+                transition: all 0.2s ease-in-out;
+            }
+
+            input[type="button"] {
+                transition: all 0.2s ease;
+            }
+
+            input[type="button"]:hover {
+                background-color: #cbe5f7; /* azul claro */
+                color: black;
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            input[type="button"]:active {
+                transform: scale(0.95);
+                box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Al pasar el mouse */
+            .button:hover {
+                background-color: #cbe5f7;
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Al hacer clic */
+            .button:active.presionar {
+                transform: scale(0.95);
+                box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
+            }
+
+            .button:disabled {
+                background-color: #ccc;
+                color: #888;
+                box-shadow: none;
+                transform: none;
+                cursor: not-allowed;
+                opacity: 0.7;
+            }
+
+            .button {
+                flex: 1 1 22%;
+                height: 60px;
+                font-size: 1.5rem;
+                border: none;
+                border-radius: 10px;
+                background: #dde1e7;
+                color: rgb(60, 60, 60);
+                transition: all 0.2s ease-in-out;
+            }
+
+            #clear {
+                background-color: #f44336;
+                color: white;
+                font-weight: bold;
+            }
+
+            #retiro{
+                background-color: #008000;
+                color: white;
+                font-weight: bold;
+            }
 
         </style>
     </head>
-    <body layout:fragment="body">
+    <body layout:fragment="body" style="background-color: #231a24">
         <div class="container mt-5">
 
             <div class="row justify-content-center">
-                <div class="col-6">
-                    <a type="button" class="btn btn-outline-primary" th:href="@{/home/llenarCajero}">Llenar cajero</a>
+                <div class="col-3 me-2">
+                    <a type="button" class="btn btn-warning" th:href="@{/home/llenarCajero}">Llenar cajero</a>
                 </div>
-                <div class="col-4">
-                    <h6>Cantidad disponible en el cajero</h6>
-                    <p th:text="${cantidad}"></p>
+                <div class="col-3">
+                    <h6 class="text-center">Cantidad disponible en el cajero</h6>
+                    <p class="text-center" th:text="${cantidad}" id="cantidad" th:data-cantidad="${cantidad}"></p>
                 </div>
             </div>
             <div class="row justify-content-center">
-                <div class="col-12 mt-5">
+                <div class="col-12">
                     <form name="form1" class="row justify-content-center g-3" method="post" th:action="@{/home/retirar}" th:object="${monto}">
-                        <div class="col-md-6">
-                            <label for="monto" class="form-label">Ingresa la cantidad a retirar</label>
-                            <input type="text" class="form-control" id="monto" th:field="*{monto}">
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class="col-5">
-                                <input value="0" type="button" onclick="form1.monto.value += '0'"/>
-                                <input value="1" type="button" onclick="form1.monto.value += '1'"/>
-                                <input value="2" type="button" onclick="form1.monto.value += '2'"/>
-                                <input value="3" type="button" onclick="form1.monto.value += '3'"/>
-                            </div>
-                        </div>
-                        <div>
-                            <input value="4" type="button" onclick="form1.monto.value += '4'"/>
-                            <input value="5" type="button" onclick="form1.monto.value += '5'"/>
-                            <input value="6" type="button" onclick="form1.monto.value += '6'"/>
-                            <input value="7" type="button" onclick="form1.monto.value += '7'"/>
-                        </div>
-                        <input value="8" type="button" onclick="form1.monto.value += '8'"/>
-                        <input value="9" type="button" onclick="form1.monto.value += '9'"/>
-                        <input type="button" value="Clear All" onclick="form1.monto.value = ''" id="clear" >
-                        <div class="row justify-content-center mt-5">
-                            <div class="col-1">
-                                <button type="submit" class="btn btn-primary">Retirar</button>
+                        <div id="cal-body"  style="padding-top: 10px;">
+                            <div class="col-12">
+                                <label for="Monto" class="form-label">Ingresa la cantidad a retirar</label>
+                                <div class="input">
+                                    <input style="color: white;" type="text" class="" onpaste="return false;" id="Monto" th:field="*{monto}" autofocus onblur="validarCantidad(this)" onkeypress="return numeros(event, this)" autocomplete="off">
+                                    <span id="MontoError" class="text-danger"></span>
+                                </div>
+                                <div class="buttons">
+                                    <input value="1" type="button" onclick="form1.monto.value += '1'"/>
+                                    <input value="2" type="button" onclick="form1.monto.value += '2'"/>
+                                    <input value="3" type="button" onclick="form1.monto.value += '3'"/>
+                                </div>
+                                <div class="buttons">
+                                    <input value="4" type="button" onclick="form1.monto.value += '4'"/>
+                                    <input value="5" type="button" onclick="form1.monto.value += '5'"/>
+                                    <input value="6" type="button" onclick="form1.monto.value += '6'"/>
+                                </div>
+                                <div class="buttons">
+                                    <input value="7" type="button" onclick="form1.monto.value += '7'"/>
+                                    <input value="8" type="button" onclick="form1.monto.value += '8'"/>
+                                    <input value="9" type="button" onclick="form1.monto.value += '9'"/>
+                                </div>
+                                <div class="buttons">
+                                    <input value="0" type="button" onclick="form1.monto.value += '0'"/>
+                                    <input type="button" value="Limpiar" onclick="form1.monto.value = ''" id="clear"/>
+                                    <button type="submit" class="button" id="retiro" disabled>Retirar</button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -55,7 +164,7 @@
             </div>
 
             <div class="row justify-content-center" th:if="${efectivoEntregado != null}">
-                <div class="col-6 mt-5">
+                <div class="col-6">
                     <h3>Billetes/monedas entregados:</h3>
                     <table class="table">
                         <thead>
@@ -74,25 +183,37 @@
                 </div>
             </div>
             <script>
-                const display = document.querySelector('.display');
-                const buttons = document.querySelectorAll('button');
+                function numeros(event, element) {
+                    let key = event.key;
+                    let regex = "^[0-9/.]*$";
+                    let errorSpan = document.getElementById(element.id + "Error");
 
-                buttons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const value = button.dataset.value;
+                    if (key.match(regex)) {
+                        errorSpan.innerHTML = "";
+                        return true;
+                    } else {
+                        errorSpan.innerHTML = "Solo numeros";
+                        return false;
+                    }
+                }
 
-                        if (value === '=') {
-                            try {
-                                display.value = eval(display.value);
-                            } catch {
-                                display.value = 'Error';
-                            }
-                        } else if (value === 'C') {
-                            display.value = '';
-                        } else {
-                            display.value += value;
-                        }
-                    });
+                function validarCantidad(element) {
+                    let data = parseFloat($("#cantidad").data("cantidad"));
+                    let valor = parseFloat($(element).val());
+
+                    if (valor < data && valor != 0 && valor != "") {
+                        $("#retiro").prop('disabled', false);
+                    } else {
+                        $("#retiro").prop('disabled', true);
+                    }
+                }
+
+                $(document).ready(function () {
+                    $("#Monto").val("");
+                    $("#Monto").focus();
+                    $("#Monto").on('paste'), function (e) {
+                        e.preventDefault();
+                    }
                 });
             </script>
         </div>
