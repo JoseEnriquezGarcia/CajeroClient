@@ -4,10 +4,12 @@ import com.JEnriquez.Crud.ML.Cantidad;
 import com.JEnriquez.Crud.ML.Monto;
 import com.JEnriquez.Crud.ML.Result;
 import com.JEnriquez.Crud.ML.TipoMoneda;
+import com.JEnriquez.Crud.ML.Usuario;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,21 +36,30 @@ public class CajeroController {
         try {
             Monto monto = new Monto();
 
+            Usuario usuario = new Usuario();
+            usuario.setUsername("admin");
+            usuario.setPassword("12345");
+
+            HttpHeaders header = new HttpHeaders();
+            header.setBasicAuth("admin", "12345");
+
+            HttpEntity<String> entity = new HttpEntity<>(header);
+
             ResponseEntity<Result<TipoMoneda>> response = restTemplate.exchange(urlBase,
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<TipoMoneda>>() {
             });
 
             ResponseEntity<Result<Cantidad>> responseCantidad = restTemplate.exchange(urlBase + "/cantidad",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Cantidad>>() {
             });
 
             ResponseEntity<Result> responseMontoTotal = restTemplate.exchange(urlBase + "/cantidadTotal",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result>() {
             });
             Result result = new Result();
@@ -76,9 +87,13 @@ public class CajeroController {
     @GetMapping("/llenarCajero")
     public String LlenarCajero(Model model) {
         try {
+            HttpHeaders header = new HttpHeaders();
+            header.setBasicAuth("admin", "12345");
+
+            HttpEntity<String> entity = new HttpEntity<>(header);
             ResponseEntity<Result> response = restTemplate.exchange(urlBase + "/llenarCajero",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result>() {
             });
 
@@ -93,17 +108,21 @@ public class CajeroController {
     @PostMapping("/retirar")
     public String retirarEfectivo(@ModelAttribute Monto monto, Model model) {
         try {
+            HttpHeaders header = new HttpHeaders();
+            header.setBasicAuth("admin", "12345");
+
+            HttpEntity<String> entity = new HttpEntity<>(header);
             Monto montoRetiro = new Monto();
+            
             ResponseEntity<Result<Map<Double, Integer>>> response = restTemplate.exchange(urlBase + "/retirar/" + monto.getMonto(),
                     HttpMethod.POST,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Map<Double, Integer>>>() {
             });
-            
-            
+
             ResponseEntity<Result> responseMontoTotal = restTemplate.exchange(urlBase + "/cantidadTotal",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result>() {
             });
 
@@ -112,13 +131,13 @@ public class CajeroController {
 
             Result resultEfectivoTotal = new Result();
             resultEfectivoTotal = responseMontoTotal.getBody();
-            
+
             Map<Double, Integer> efectivo = result.objects.get(0);
-            
+
             model.addAttribute("cantidad", resultEfectivoTotal.object);
             model.addAttribute("efectivoEntregado", efectivo);
             model.addAttribute("monto", montoRetiro);
-            
+
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
