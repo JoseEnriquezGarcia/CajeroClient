@@ -119,11 +119,10 @@
         <div class="container mt-5">
 
             <div class="row justify-content-center">
-                <div sec:authorize="isAuthenticated()">
-                    <p>Hola, <span sec:authentication="username"></span>!</p>
-                </div>
+                <p>Hola, <span th:text="${username}"></span>!</p>
                 <div class="col-3 me-2">
                     <a type="button" class="btn btn-warning" sec:authorize="hasRole('Admin')" th:href="@{/home/llenarCajero}">Llenar cajero</a>
+                    <a type="button" class="btn btn-danger" sec:authorize="hasRole('Admin')" th:href="@{/logout}">Logout</a>
                 </div>
                 <div class="col-3">
                     <h6 class="text-center">Cantidad disponible en el cajero</h6>

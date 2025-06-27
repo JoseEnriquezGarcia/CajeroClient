@@ -5,6 +5,7 @@ import com.JEnriquez.Crud.ML.Monto;
 import com.JEnriquez.Crud.ML.Result;
 import com.JEnriquez.Crud.ML.TipoMoneda;
 import com.JEnriquez.Crud.ML.Usuario;
+import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -32,16 +33,15 @@ public class CajeroController {
     private String urlBase = "http://localhost:8081/cajero";
 
     @GetMapping
-    public String GetAllMonedas(Model model) {
+    public String GetAllMonedas(Model model, HttpSession session) {
         try {
-            Monto monto = new Monto();
-
             Usuario usuario = new Usuario();
-            usuario.setUsername("admin");
-            usuario.setPassword("12345");
-
+            usuario.setUsername(session.getAttribute("username").toString());
+            usuario.setPassword(session.getAttribute("password").toString());
+            
+            Monto monto = new Monto();
             HttpHeaders header = new HttpHeaders();
-            header.setBasicAuth("admin", "12345");
+            header.setBasicAuth(usuario.getUsername(), usuario.getPassword());
 
             HttpEntity<String> entity = new HttpEntity<>(header);
 
@@ -75,6 +75,7 @@ public class CajeroController {
             model.addAttribute("Denominaciones", resultDenominaciones.objects);
             model.addAttribute("cantidad", resultMontoTotal.object);
             model.addAttribute("monto", monto);
+            model.addAttribute("username", usuario.getUsername());
 
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
