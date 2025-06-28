@@ -5,6 +5,10 @@ import lombok.Setter;
 
 @Getter @Setter
 public class Usuario {
-    private String username;
-    private String password;
+    private int IdUsuario;
+    private String Nombre;
+    private String Username;
+    private String Password;
+    private double Saldo;
+    public Rol rol;
 }

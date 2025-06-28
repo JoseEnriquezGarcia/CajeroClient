@@ -117,16 +117,38 @@
     </head>
     <body layout:fragment="body" style="background-color: #231a24">
         <div class="container mt-5">
-
             <div class="row justify-content-center">
-                <p>Hola, <span th:text="${username}"></span>!</p>
+                <h3 class="text-center">Hola, <span th:text="${usuario.nombre}"></span>!</h3>
+                <h6 class="text-center mb-4">¿Cuanto deseas retirar?</h6>
                 <div class="col-3 me-2">
-                    <a type="button" class="btn btn-warning" sec:authorize="hasRole('Admin')" th:href="@{/home/llenarCajero}">Llenar cajero</a>
-                    <a type="button" class="btn btn-danger" sec:authorize="hasRole('Admin')" th:href="@{/logout}">Logout</a>
+                    <a type="button" class="btn btn-warning" th:href="@{/home/llenarCajero}" th:if="${usuario.rol.nombre == 'Administrador'}">Llenar cajero</a>
                 </div>
                 <div class="col-3">
-                    <h6 class="text-center">Cantidad disponible en el cajero</h6>
-                    <p class="text-center" th:text="${cantidad}" id="cantidad" th:data-cantidad="${cantidad}"></p>
+                    <h6 class="text-center" th:hidden="${usuario.rol.nombre == 'Cliente'}">Cantidad disponible en el cajero</h6>
+                    <p class="text-center" th:text="${cantidad}" id="cantidad" th:data-cantidad="${cantidad}" th:hidden="${usuario.rol.nombre == 'Cliente'}"></p>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-4 mb-4" th:if="${efectivoEntregado != null}">
+                <div class="col-md-6">
+                    <div class="card shadow rounded-4 border-0">
+                        <div class="card-body">
+                            <h4 class="card-title text-center mb-4">Billetes/Monedas Entregados</h4>
+                            <table class="table table-bordered table-hover align-middle text-center">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col">Denominación</th>
+                                        <th scope="col">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="efectivo : ${efectivoEntregado}">
+                                        <td th:text="${efectivo.key}">Denominación</td>
+                                        <td th:text="${efectivo.value}">Cantidad</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -156,32 +178,13 @@
                                 </div>
                                 <div class="buttons">
                                     <input value="0" type="button" onclick="form1.monto.value += '0'"/>
+                                    <input value="." type="button" onclick="form1.monto.value += '.'"/>
                                     <input type="button" value="Limpiar" onclick="form1.monto.value = '', validarCantidad(element)" id="clear"/>
                                     <button type="submit" class="button" id="retiro" disabled>Retirar</button>
                                 </div>
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-
-            <div class="row justify-content-center" th:if="${efectivoEntregado != null}">
-                <div class="col-6">
-                    <h3>Billetes/monedas entregados:</h3>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Denominación</th>
-                                <th>Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="efectivo : ${efectivoEntregado}">
-                                <td th:text="${efectivo.key}">Denominación</td>
-                                <td th:text="${efectivo.value}">Cantidad</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
             <script>

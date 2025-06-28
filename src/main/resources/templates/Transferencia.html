@@ -1,0 +1,72 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{Layout}">
+    <head>
+        <title>Deposito</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body layout:fragment="body" style="background-color: #231a24">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-5">
+                    <h2>Hola <span th:text="${usuario.nombre}"></span>!</h2>
+                    <h6>¿Cuanto deseas depositar?</h6>
+                    <form class="row row-cols-lg-auto g-3 mt-3 align-items-center" th:object="${monto}" method="post" th:action="@{/home/procesarDeposito}">
+                        <label for="deposito" class="col-sm-2 col-form-label">Cantidad</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="deposito" th:field="*{monto}" onkeypress="return numeros(event, this)" autocomplete="off">
+                            <span id="depositoError" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-3">
+                            <button type="submit" class="btn btn-primary" id="btnDeposito" disabled>Depositar</button>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="validacion">
+                                <label class="form-check-label" for="inlineFormCheck">
+                                    Check de seguridad
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            
+            function numeros(event, element) {
+                let key = event.key;
+                let regex = "^[0-9/.]*$";
+                let errorSpan = document.getElementById(element.id + "Error");
+
+                if (key.match(regex)) {
+                    errorSpan.innerHTML = "";
+                    return true;
+                } else {
+                    errorSpan.innerHTML = "Solo numeros";
+                    return false;
+                }
+            }
+
+            $("#validacion").on('change', function () {
+                let isChecked = $("#validacion").is(":checked");
+                let deposito = parseFloat($("#deposito").val());
+
+                if (isChecked == true && deposito > 1) {
+                    $("#btnDeposito").prop('disabled', false);
+                } else {
+                    $("#btnDeposito").prop('disabled', true);
+                }
+            });
+
+            $(document).ready(function () {
+                $("#deposito").val("");
+                $("#deposito").focus();
+                $("#deposito").on('paste'), function (e) {
+                    e.preventDefault();
+                }
+            });
+        </script>
+    </body>
+</html>
