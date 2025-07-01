@@ -17,16 +17,16 @@ public class LoginController {
         model.addAttribute("usuario", usuario);
         return "Login";
     }
-    
+
     @PostMapping("/validation")
-    public String Process(@ModelAttribute Usuario usuario, HttpSession session){
+    public String Process(@ModelAttribute Usuario usuario, HttpSession session) {
         session.setAttribute("username", usuario.getUsername());
         session.setAttribute("password", usuario.getPassword());
         return "redirect:/home";
     }
-    
+
     @GetMapping("/logout")
-    public String Logout(HttpSession session){
+    public String Logout(HttpSession session) {
         session.removeAttribute("username");
         session.removeAttribute("password");
         return "redirect:/login";

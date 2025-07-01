@@ -121,11 +121,11 @@
                 <h3 class="text-center">Hola, <span th:text="${usuario.nombre}"></span>!</h3>
                 <h6 class="text-center mb-4">¿Cuanto deseas retirar?</h6>
                 <div class="col-3 me-2">
-                    <a type="button" class="btn btn-warning" th:href="@{/home/llenarCajero}" th:if="${usuario.rol.nombre == 'Administrador'}">Llenar cajero</a>
+                    <a type="button" class="btn btn-warning" th:href="@{/home/llenarCajero}" th:if="${rol == 'Administrador'}">Llenar cajero</a>
                 </div>
                 <div class="col-3">
-                    <h6 class="text-center" th:hidden="${usuario.rol.nombre == 'Cliente'}">Cantidad disponible en el cajero</h6>
-                    <p class="text-center" th:text="${cantidad}" id="cantidad" th:data-cantidad="${cantidad}" th:hidden="${usuario.rol.nombre == 'Cliente'}"></p>
+                    <h6 class="text-center" th:hidden="${rol == 'Cliente'}">Cantidad disponible en el cajero</h6>
+                    <p class="text-center" th:text="${cantidad}" id="cantidad" th:data-cantidad="${cantidad}" th:hidden="${rol == 'Cliente'}"></p>
                 </div>
             </div>
             <div class="row justify-content-center mt-4 mb-4" th:if="${efectivoEntregado != null}">
@@ -158,28 +158,26 @@
                             <div class="col-12">
                                 <label for="Monto" class="form-label">Ingresa la cantidad a retirar</label>
                                 <div class="input">
-                                    <input style="color: white;" type="text" class="" onpaste="return false;" id="Monto" th:field="*{monto}" autofocus onblur="validarCantidad(this)" onkeypress="return numeros(event, this)" autocomplete="off">
-                                    <span id="MontoError" class="text-danger"></span>
+                                    <input style="color: white;" type="text" onpaste="return false;" id="Monto" th:field="*{monto}" autofocus onblur="validarCantidad(this);" onkeypress="return filterFloat(event, this);" autocomplete="off">
                                 </div>
                                 <div class="buttons">
-                                    <input value="1" type="button" onclick="form1.monto.value += '1'"/>
-                                    <input value="2" type="button" onclick="form1.monto.value += '2'"/>
-                                    <input value="3" type="button" onclick="form1.monto.value += '3'"/>
+                                    <input value="1" type="button" onclick="inputNumeros(this);"/>
+                                    <input value="2" type="button" onclick="inputNumeros(this);"/>
+                                    <input value="3" type="button" onclick="inputNumeros(this);"/>
                                 </div>
                                 <div class="buttons">
-                                    <input value="4" type="button" onclick="form1.monto.value += '4'"/>
-                                    <input value="5" type="button" onclick="form1.monto.value += '5'"/>
-                                    <input value="6" type="button" onclick="form1.monto.value += '6'"/>
+                                    <input value="4" type="button" onclick="inputNumeros(this);"/>
+                                    <input value="5" type="button" onclick="inputNumeros(this);"/>
+                                    <input value="6" type="button" onclick="inputNumeros(this);"/>
                                 </div>
                                 <div class="buttons">
-                                    <input value="7" type="button" onclick="form1.monto.value += '7'"/>
-                                    <input value="8" type="button" onclick="form1.monto.value += '8'"/>
-                                    <input value="9" type="button" onclick="form1.monto.value += '9'"/>
+                                    <input value="7" type="button" onclick="inputNumeros(this);"/>
+                                    <input value="8" type="button" onclick="inputNumeros(this);"/>
+                                    <input value="9" type="button" onclick="inputNumeros(this);"/>
                                 </div>
                                 <div class="buttons">
-                                    <input value="0" type="button" onclick="form1.monto.value += '0'"/>
-                                    <input value="." type="button" onclick="form1.monto.value += '.'"/>
-                                    <input type="button" value="Limpiar" onclick="form1.monto.value = '', validarCantidad(element)" id="clear"/>
+                                    <input value="0" type="button" onclick="inputNumeros(this);"/>
+                                    <input type="button" value="Limpiar" onclick="clearInput();" id="clear"/>
                                     <button type="submit" class="button" id="retiro" disabled>Retirar</button>
                                 </div>
                             </div>
@@ -188,25 +186,38 @@
                 </div>
             </div>
             <script>
-                function numeros(event, element) {
-                    let key = event.key;
-                    let regex = "^[0-9/.]*$";
-                    let errorSpan = document.getElementById(element.id + "Error");
-
-                    if (key.match(regex)) {
-                        errorSpan.innerHTML = "";
-                        return true;
-                    } else {
-                        errorSpan.innerHTML = "Solo numeros";
-                        return false;
+                function inputNumeros(element){
+                    document.getElementById("Monto").value += element.value;
+                }
+                
+                function clearInput(){
+                    document.getElementById("Monto").value = '';
+                }
+                
+                function filterFloat(evt, input) {
+                    var key = window.Event ? evt.which : evt.keyCode;
+                    var chark = String.fromCharCode(key);
+                    var tempValue = input.value + chark;
+                    var isNumber = (key >= 48 && key <= 57);
+                    var isSpecial = (key == 8 || key == 13 || key == 0 || key == 46);
+                    if (isNumber || isSpecial) {
+                        return filter(tempValue);
                     }
+
+                    return false;
+
+                }
+                function filter(__val__) {
+                    var preg = /^([0-9]+\.?[0-9]{0,2})$/;
+                    return (preg.test(__val__) === true);
                 }
 
                 function validarCantidad(element) {
                     let data = parseFloat($("#cantidad").data("cantidad"));
+                    let dataSaldo = parseFloat($("#saldo").data("saldo"));
                     let valor = parseFloat($(element).val());
 
-                    if (valor < data && valor != 0 && valor != "") {
+                    if (valor < data && valor != 0 && valor != "" && valor <= dataSaldo) {
                         $("#retiro").prop('disabled', false);
                     } else {
                         $("#retiro").prop('disabled', true);
@@ -215,10 +226,6 @@
 
                 $(document).ready(function () {
                     $("#Monto").val("");
-//                    $("#Monto").focus();
-                    $("#Monto").on('paste'), function (e) {
-                        e.preventDefault();
-                    }
                 });
             </script>
         </div>

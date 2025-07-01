@@ -3,11 +3,10 @@ package com.JEnriquez.Crud.Controller;
 import com.JEnriquez.Crud.ML.Cantidad;
 import com.JEnriquez.Crud.ML.Monto;
 import com.JEnriquez.Crud.ML.Result;
-import com.JEnriquez.Crud.ML.TipoMoneda;
 import com.JEnriquez.Crud.ML.Usuario;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,22 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
-/*
-login cuando ingrese a otra ruta enviar directamente a el login
-
-. evitar que haya mas de un punto en el cajero
-
-Enviar rol del usuario desde spring security context no desde la base de datos
-*/
-
 
 @Controller
 @RequestMapping("/home")
@@ -44,36 +31,45 @@ public class CajeroController {
     @GetMapping
     public String GetAllMonedas(Model model, HttpSession session) {
         try {
-            Usuario usuario = new Usuario();
-            usuario.setUsername(session.getAttribute("username").toString());
-            usuario.setPassword(session.getAttribute("password").toString());
+            if (session != null && session.getAttribute("username") != null) {
+                Monto monto = new Monto();
 
-            Monto monto = new Monto();
-            HttpHeaders header = new HttpHeaders();
-            header.setBasicAuth(usuario.getUsername(), usuario.getPassword());
+                Usuario usuario = new Usuario();
+                usuario.setUsername(session.getAttribute("username").toString());
+                usuario.setPassword(session.getAttribute("password").toString());
 
-            HttpEntity<String> entity = new HttpEntity<>(header);
+                HttpHeaders header = new HttpHeaders();
+                header.setBasicAuth(usuario.getUsername(), usuario.getPassword());
 
-            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(urlBase + "/usuario/" + usuario.getUsername(),
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<Result<Usuario>>() {
-            });
+                HttpEntity<String> entity = new HttpEntity<>(header);
 
-            ResponseEntity<Result> responseMontoTotal = restTemplate.exchange(urlBase + "/cantidadTotal",
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<Result>() {
-            });
+                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(urlBase + "/usuario/" + usuario.getUsername(),
+                        HttpMethod.GET,
+                        entity,
+                        new ParameterizedTypeReference<Result<Usuario>>() {
+                });
+                
+                List<String> headers = responseUsuario.getHeaders().get("X-Auth-Rol");
+                String Rol = headers.get(0);
+                
+                ResponseEntity<Result> responseMontoTotal = restTemplate.exchange(urlBase + "/cantidadTotal",
+                        HttpMethod.GET,
+                        entity,
+                        new ParameterizedTypeReference<Result>() {
+                });
 
-            Result result = new Result();
-            result = responseMontoTotal.getBody();
+                Result result = new Result();
+                result = responseMontoTotal.getBody();
 
-            Result resultUsuario = responseUsuario.getBody();
+                Result resultUsuario = responseUsuario.getBody();
 
-            model.addAttribute("cantidad", result.object);
-            model.addAttribute("monto", monto);
-            model.addAttribute("usuario", resultUsuario.object);
+                model.addAttribute("cantidad", result.object);
+                model.addAttribute("monto", monto);
+                model.addAttribute("usuario", resultUsuario.object);
+                model.addAttribute("rol", Rol);
+            } else {
+                return "redirect:/login";
+            }
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
@@ -85,32 +81,35 @@ public class CajeroController {
     @GetMapping("/deposito")
     public String Deposito(Model model, HttpSession session) {
         try {
-            Monto monto = new Monto();
-            Usuario usuario = new Usuario();
-            usuario.setUsername(session.getAttribute("username").toString());
-            usuario.setPassword(session.getAttribute("password").toString());
+            if (session != null && session.getAttribute("username") != null) {
+                Monto monto = new Monto();
+                Usuario usuario = new Usuario();
+                usuario.setUsername(session.getAttribute("username").toString());
+                usuario.setPassword(session.getAttribute("password").toString());
 
-            HttpHeaders header = new HttpHeaders();
-            header.setBasicAuth(usuario.getUsername(), usuario.getPassword());
+                HttpHeaders header = new HttpHeaders();
+                header.setBasicAuth(usuario.getUsername(), usuario.getPassword());
 
-            HttpEntity<String> entity = new HttpEntity<>(header);
-            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(urlBase + "/usuario/" + usuario.getUsername(),
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<Result<Usuario>>() {
-            });
+                HttpEntity<String> entity = new HttpEntity<>(header);
+                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(urlBase + "/usuario/" + usuario.getUsername(),
+                        HttpMethod.GET,
+                        entity,
+                        new ParameterizedTypeReference<Result<Usuario>>() {
+                });
 
-            Result resultUsuario = responseUsuario.getBody();
+                Result resultUsuario = responseUsuario.getBody();
 
-            model.addAttribute("usuario", resultUsuario.object);
-            model.addAttribute("monto", monto);
-
+                model.addAttribute("usuario", resultUsuario.object);
+                model.addAttribute("monto", monto);
+            } else {
+                return "redirect:/login";
+            }
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
-        return "Transferencia";
+        return "Deposito";
     }
 
     @PostMapping("/procesarDeposito")
@@ -124,7 +123,7 @@ public class CajeroController {
             header.setBasicAuth(usuario.getUsername(), usuario.getPassword());
             HttpEntity<String> entity = new HttpEntity<>(header);
 
-            ResponseEntity<Result> response = restTemplate.exchange(urlBase + "/deposito/"  + monto.getMonto() + "/" + usuario.getUsername(),
+            ResponseEntity<Result> response = restTemplate.exchange(urlBase + "/deposito/" + monto.getMonto() + "/" + usuario.getUsername(),
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<Result>() {

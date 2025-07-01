@@ -13,7 +13,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body layout:fragment="body">
-        <a class="btn btn-warning" th:href="@{/login}">Regresar</a>
+        <a class="btn btn-warning" onclick="history.back();">Regresar</a>
         <p th:text="${statusCode}"></p>
         <p th:text="${message}"></p>
     </body>

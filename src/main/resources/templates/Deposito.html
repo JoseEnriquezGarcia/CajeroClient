@@ -14,7 +14,7 @@
                     <form class="row row-cols-lg-auto g-3 mt-3 align-items-center" th:object="${monto}" method="post" th:action="@{/home/procesarDeposito}">
                         <label for="deposito" class="col-sm-2 col-form-label">Cantidad</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="deposito" th:field="*{monto}" onkeypress="return numeros(event, this)" autocomplete="off">
+                            <input type="text" class="form-control" id="deposito" th:field="*{monto}" onkeypress="return filterFloat(event, this)" autocomplete="off">
                             <span id="depositoError" class="text-danger"></span>
                         </div>
 
@@ -34,18 +34,33 @@
             </div>
         </div>
         <script>
-            
-            function numeros(event, element) {
-                let key = event.key;
-                let regex = "^[0-9/.]*$";
-                let errorSpan = document.getElementById(element.id + "Error");
 
-                if (key.match(regex)) {
-                    errorSpan.innerHTML = "";
-                    return true;
+            function filterFloat(evt, input) {
+                var key = window.Event ? evt.which : evt.keyCode;
+                var chark = String.fromCharCode(key);
+                var tempValue = input.value + chark;
+                var isNumber = (key >= 48 && key <= 57);
+                var isSpecial = (key == 8 || key == 13 || key == 0 || key == 46);
+                if (isNumber || isSpecial) {
+                    return filter(tempValue);
+                }
+
+                return false;
+
+            }
+            function filter(__val__) {
+                var preg = /^([0-9]+\.?[0-9]{0,2})$/;
+                return (preg.test(__val__) === true);
+            }
+
+            function validarCantidad(element) {
+                let data = parseFloat($("#cantidad").data("cantidad"));
+                let valor = parseFloat($(element).val());
+
+                if (valor < data && valor != 0 && valor != "") {
+                    $("#retiro").prop('disabled', false);
                 } else {
-                    errorSpan.innerHTML = "Solo numeros";
-                    return false;
+                    $("#retiro").prop('disabled', true);
                 }
             }
 
@@ -63,9 +78,6 @@
             $(document).ready(function () {
                 $("#deposito").val("");
                 $("#deposito").focus();
-                $("#deposito").on('paste'), function (e) {
-                    e.preventDefault();
-                }
             });
         </script>
     </body>
